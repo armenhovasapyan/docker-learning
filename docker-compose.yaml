@@ -1,0 +1,39 @@
+services:
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    volumes:
+      - mongodbdata:/data/db
+    env_file:
+      - ./env/mongo.env
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    image: backend
+    container_name: backend
+    volumes:
+      - ./backend/src:/app/src
+    ports:
+      - "8001:8000"
+    env_file:
+      - ./env/backend.env
+    depends_on:
+      - mongodb
+  frontend:
+    build: ./frontend
+    image: frontend
+    container_name: frontend
+    volumes:
+      - ./frontend/src:/app/src
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./env/frontend.env
+    depends_on:
+      - backend
+    stdin_open: true
+    tty: true
+
+volumes:
+  mongodbdata:
